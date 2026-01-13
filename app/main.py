@@ -68,10 +68,10 @@ def create_post(post: Post , db: Session = Depends(get_db)):
     return {"message": "Post created successfully", "post": new_post}
 
 @app.get("/posts/latest")    
-def get_latest_post(): 
-    cursor.execute(""" SELECT * FROM posts ORDER BY id DESC LIMIT 1 """)
-    post = cursor.fetchone()
-    return {"post": post}
+def get_latest_post(post:Post , db: Session = Depends(get_db)):
+    latest_post = db.query(models.Post).order_by(models.Post.id.desc()).first()
+    return {"latest_post": latest_post}
+    
   
 @app.get("/posts/{id}")
 def get_post(id: int, response: Response, db: Session = Depends(get_db)):
