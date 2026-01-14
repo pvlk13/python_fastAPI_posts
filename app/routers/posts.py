@@ -5,6 +5,7 @@ from .. import models, schemas
 
 from fastapi import FastAPI, Body, Response, status, HTTPException, Depends , APIRouter
 from typing import List
+from .. import oauth
 
 router = APIRouter(
     prefix="/posts",
@@ -19,10 +20,11 @@ async def get_posts(db: Session = Depends(get_db)):
     return  posts
 
 @router.post("/" , status_code=status.HTTP_201_CREATED , response_model=schemas.PostResponse)
-def create_post(post: schemas.PostCreate , db: Session = Depends(get_db)):
+def create_post(post: schemas.PostCreate , db: Session = Depends(get_db), get_current_user: int = Depends(oauth.get_current_user) ):
     #cursor.execute("""INSERT INTO posts (title,content,published) VALUES (%s, %s, %s) RETURNING *""",(new_post.title, new_post.content, new_post.published))
     #created_post = cursor.fetchone()
     #conn.commit()
+    print(get_current_user)
     new_post = models.Post(title=post.title, content=post.content, published=post.published)
     db.add(new_post)
     db.commit()
@@ -45,7 +47,7 @@ def get_post(id: int, response: Response, db: Session = Depends(get_db)):
    return post
 
 @router.delete("/{id}")
-def delete_post(id: int , db: Session = Depends(get_db)):
+def delete_post(id: int , db: Session = Depends(get_db), get_current_user: int = Depends(oauth.get_current_user)):
     #cursor.execute(""" DELETE FROM posts WHERE id = %s RETURNING * """, (str(id),))
     #deleted_post = cursor.fetchone()
     deleted_post = db.query(models.Post).filter(models.Post.id == id).first()
@@ -56,7 +58,7 @@ def delete_post(id: int , db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
     
 @router.put("/{id}", response_model=schemas.PostResponse)
-def update_post(id: int , updated_post: schemas.PostCreate , db: Session = Depends(get_db)):
+def update_post(id: int , updated_post: schemas.PostCreate , db: Session = Depends(get_db), get_current_user: int = Depends(oauth.get_current_user)):
    # cursor.execute(""" UPDATE posts SET title = %s , content = %s , published = %s WHERE id = %s RETURNING * """,
    #                (updated_post.title, updated_post.content, updated_post.published, str(id)) )
    # result = cursor.fetchone()
