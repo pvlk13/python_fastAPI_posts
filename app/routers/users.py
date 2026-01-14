@@ -7,9 +7,11 @@ from typing import List
 from .. password import ph
 
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/users",
+)
 
-@router.post("/users" , status_code=status.HTTP_201_CREATED, response_model=schemas.UserResponse)
+@router.post("/" , status_code=status.HTTP_201_CREATED, response_model=schemas.UserResponse)
 def create_user(user: schemas.UserCreate , db: Session = Depends(get_db)):
     #hash the password - user.password
     hashed_password = ph.hash(user.password)
@@ -19,20 +21,20 @@ def create_user(user: schemas.UserCreate , db: Session = Depends(get_db)):
     db.refresh(new_user)
     return  new_user
 
-@router.get("/users/{id}", response_model=schemas.UserResponse)
+@router.get("/{id}", response_model=schemas.UserResponse)
 def get_user(id: int, db: Session = Depends(get_db)):
    user = db.query(models.User).filter(models.User.id == id).first()
    if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id: {id} was not found")
    return user
 
-@router.get("/users", response_model=List[schemas.UserResponse])
+@router.get("/", response_model=List[schemas.UserResponse])
 def get_all_users(db: Session = Depends(get_db)):
     users = db.query(models.User).all()
     return users
 
 
-@router.put("/users/{id}", response_model=schemas.UserResponse)
+@router.put("/{id}", response_model=schemas.UserResponse)
 def update_users(id: int ,user: schemas.UserCreate, db: Session = Depends(get_db)):
     user_query = db.query(models.User).filter(models.User.id == id)
     updated_user = user_query.first()
