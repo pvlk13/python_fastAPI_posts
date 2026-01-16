@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
+from pydantic.types import conint
 
 
 class PostBase(BaseModel):
@@ -12,6 +13,7 @@ class PostResponse(PostBase):
     id: int
     created_at: datetime
     owner_id: int
+    owner: 'UserResponse'
     class Config:
         orm_mode = True
 class UserCreate(BaseModel):
@@ -30,5 +32,11 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 class TokenData(BaseModel):
-    user_id: int | None = None                 
+    user_id: int | None = None 
+
+VoteDir = conint(le=1)
+
+class Vote(BaseModel):
+    post_id: int
+    dir: conint(le=1)  # 1 for upvote, 0 for remove vote
         

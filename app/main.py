@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from .database import engine,  get_db
 from sqlalchemy.orm import Session
 from . import models
-from .routers import posts, users , auth
+from .routers import posts, users , auth , vote
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
@@ -15,6 +15,7 @@ app = FastAPI()
 app.include_router(posts.router)
 app.include_router(users.router)
 app.include_router(auth.router)
+app.include_router(vote.router)
   
 while True:    
 
